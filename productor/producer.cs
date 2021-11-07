@@ -5,12 +5,46 @@ using System.Net;
 
 class Producer
 {
-    static void Main()
+    static void Main(string[] args)
     {
+        string bootstrapServ = "";
+        string nombreTopic = "";
+        //En caso de que no se introduzcan valores como argumento, cogemos la configuracion por defecto:
+        if (args.Length == 0)
+        {
+            Console.Write("Por favor, introduce el bootstrap Server: ");
+            bootstrapServ = Console.ReadLine();
+            Console.Write("Introduzca el nombre del topic: ");
+            nombreTopic = Console.ReadLine();
+        }
+        else
+        {
+            for(int i = 0; i < args.Length; i++)
+            {
+                if (args[i] == "--bootstrap-server")
+                {
+                    bootstrapServ = args[i + 1];
+                }
+                if(args[i] == "--topic")
+                {
+                    nombreTopic = args[i + 1];
+                }
+            }
+            if (bootstrapServ == "")
+            {
+                Console.Write("Por favor, introduce el bootstrap Server: ");
+                bootstrapServ = Console.ReadLine();
+            }
+            if(nombreTopic == "")
+            {
+                Console.Write("Introduzca el nombre del topic: ");
+                nombreTopic = Console.ReadLine();
+            }
+        }
         var config = new ProducerConfig
         {
             
-            BootstrapServers = "localhost:9092",
+            BootstrapServers = bootstrapServ,
             
         };
         
@@ -25,11 +59,11 @@ class Producer
             int numProduced=0;
             do
             {
-                Console.WriteLine("Introduzca un texto (escribe \"SALIR\" para finalizar)");
+                Console.Write("Introduzca un texto (escribe \"SALIR\" para finalizar): ");
                 texto = Console.ReadLine();
                 if(texto != "SALIR")
                 {
-                    producer.Produce("sd-events", new Message<Null, string> { Value = texto });
+                    producer.Produce(nombreTopic, new Message<Null, string> { Value = texto });
                     numProduced++;
                 }
             } while (texto != "SALIR");  
