@@ -10,19 +10,51 @@ namespace consumer
     {
         static void Main(string[] args)
         {
-
+            string bootstrapServ = "";
+            string nombreTopic = "";
+            //En caso de que no se introduzcan valores como argumento, cogemos la configuracion por defecto:
+            if (args.Length == 0)
+            {
+                Console.Write("Por favor, introduce el bootstrap Server: ");
+                bootstrapServ = Console.ReadLine();
+                Console.Write("Introduzca el nombre del topic: ");
+                nombreTopic = Console.ReadLine();
+            }
+            else
+            {
+                for (int i = 0; i < args.Length; i++)
+                {
+                    if (args[i] == "--bootstrap-server")
+                    {
+                        bootstrapServ = args[i + 1];
+                    }
+                    if (args[i] == "--topic")
+                    {
+                        nombreTopic = args[i + 1];
+                    }
+                }
+                if (bootstrapServ == "")
+                {
+                    Console.Write("Por favor, introduce el bootstrap Server: ");
+                    bootstrapServ = Console.ReadLine();
+                }
+                if (nombreTopic == "")
+                {
+                    Console.Write("Introduzca el nombre del topic: ");
+                    nombreTopic = Console.ReadLine();
+                }
+            }
 
 
             var config = new ConsumerConfig
             {
 
-                BootstrapServers = "localhost:9092",
+                BootstrapServers = bootstrapServ,
                 GroupId = "console-consumer-43044"
 
             };
 
             using (var consumer = new ConsumerBuilder<Null, string>(config) 
-            
             .Build())
             {
                 consumer.Subscribe("sd-events");

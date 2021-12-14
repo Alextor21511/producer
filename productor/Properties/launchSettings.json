@@ -1,8 +1,7 @@
 {
   "profiles": {
     "producer": {
-      "commandName": "Project",
-      "commandLineArgs": "--bootstrap-server localhost:9092 --topic sd-events"
+      "commandName": "Project"
     }
   }
 }
