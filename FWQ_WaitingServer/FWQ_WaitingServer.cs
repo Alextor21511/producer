@@ -72,12 +72,11 @@ class FWQ_WaitingServer {
         };
         Socket conectar_SE = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-        IPEndPoint direccion = new IPEndPoint(IPAddress.Parse("172.27.83.217"), 1234);
+        IPEndPoint direccion = new IPEndPoint(IPAddress.Parse("172.27.101.136"), 8080);
 
         conectar_SE.Connect(direccion);
 
         Console.WriteLine("CONECTADO");
-
 
         String resultado = "";
         using (var consumer = new ConsumerBuilder<Null, string>(config)
@@ -92,7 +91,7 @@ class FWQ_WaitingServer {
                 byte[] enviar_respuesta = Encoding.Default.GetBytes(respuesta);
 
                 conectar_SE.Send(enviar_respuesta, 0, enviar_respuesta.Length, 0);
-                Thread.Sleep(2000);
+                Thread.Sleep(200);
             }
             
             

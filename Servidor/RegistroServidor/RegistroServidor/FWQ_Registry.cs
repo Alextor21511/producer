@@ -141,7 +141,7 @@ public class AsynchronousSocketListener
             int orden = Int32.Parse(datos[3]);
             if (orden==1)
             {
-                    SQLiteConnection cadenaConexion = new SQLiteConnection("Data Source = C:/Users/user/Desktop/3ANO/SD/REGISTRY/general.sqlite");
+                    SQLiteConnection cadenaConexion = new SQLiteConnection("Data Source = C:/Users/aleja/Onedrive/Escritorio/general.sqlite");
                     cadenaConexion.Open();
                     string consulta = "select * from usuarios";
                     SQLiteCommand comando = new SQLiteCommand(consulta, cadenaConexion);
@@ -167,7 +167,7 @@ public class AsynchronousSocketListener
                 }
             if (orden==2)
             {
-                SQLiteConnection cadenaConexion = new SQLiteConnection("Data Source = C:/Users/user/Desktop/3ANO/SD/REGISTRY/general.sqlite");
+                SQLiteConnection cadenaConexion = new SQLiteConnection("Data Source = C:/Users/aleja/Onedrive/Escritorio/general.sqlite");
                 cadenaConexion.Open();
                 string consulta = "select * from usuarios";
                 SQLiteCommand comando = new SQLiteCommand(consulta, cadenaConexion);

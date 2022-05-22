@@ -206,18 +206,18 @@ public class AsynchronousClient
         }
     }
 
-    public static string[,] mostrarMapa()
+    public static void EntrarParque(int respuesta, string bootstrapServ, string nombreTopic)
     {
-        string bootstrapServ = "";
-        string nombreTopic = "";
-        //En caso de que no se introduzcan valores como argumento, cogemos la configuracion por defecto:
-        
-        Console.Write("Por favor, introduce el bootstrap Server: ");
-        bootstrapServ = Console.ReadLine();
-        Console.Write("Introduzca el nombre del topic: ");
-        nombreTopic = Console.ReadLine();
-        string[,] map = new string[20, 20];
+        String s;
 
+        s = "3 ";
+        Console.WriteLine("Alias de usuario: ");
+        s += Console.ReadLine() + " ";
+        Console.WriteLine("Password de usuario: ");
+        s += Console.ReadLine();
+        
+        //CONSUMIDOR
+        string recibido;
         var config = new ConsumerConfig
         {
 
@@ -226,23 +226,114 @@ public class AsynchronousClient
 
         };
 
-        using (var consumer = new ConsumerBuilder<Null, string[,]>(config)
-        .Build())
+        var config2 = new ProducerConfig
+        {
+            BootstrapServers = bootstrapServ,
+        };
+
+        using (var producer = new ProducerBuilder<Null, string>(config2).Build())
+        {
+            producer.Produce(nombreTopic, new Message<Null, string> { Value = s });
+            producer.Flush(TimeSpan.FromSeconds(10));
+        }
+
+        Thread.Sleep(10000);
+
+
+
+        using (var consumer = new ConsumerBuilder<Null, string>(config).Build())
         {
             consumer.Subscribe(nombreTopic);
-            
-            ConsumeResult<Null, string[,]> consumeResult = consumer.Consume();
-            map = consumeResult.Value;
-            
+            Console.WriteLine("1");
+            ConsumeResult<Null, string> consumeResult = consumer.Consume();
+            Console.WriteLine("2");
+            recibido = consumeResult.Value;
         }
-        return map;
+        Console.WriteLine("Datos recibidos");
+
+        String[] datos_recibidos = recibido.Split(' ');
+
+        String[] datos_usuario = datos_recibidos[0].Split(' ');
+        String[] datos_parque = datos_recibidos[0].Split(' ');
+
+        String[,] mapa = new string[20, 20];
+
+        while (!datos_recibidos.Equals("Error"))
+        {
+            //CREAR TABLA
+            Console.WriteLine("*****PARQUE DE ATRACCIONES VVIVES*****\n" +
+                                "ID   Nombre  Pos.    Destino\n");
+            for (int i = 0; i < datos_usuario.Length; i++)
+            {
+                for (int j = 0; j <= datos_usuario.Length / 3; j++)
+                {
+                    Console.WriteLine("X#   " + datos_usuario[0 + j * 3] + "  #" + datos_usuario[1 + j * 3] + datos_usuario[2 + j * 3] + "\n");
+                }
+            }
+
+            //INTRODUCIR USUARIOS
+            for (int i = 0; i < datos_usuario.Length; i++)
+            {
+                if (datos_usuario[i] == "U")
+                {
+                    mapa[Int32.Parse(datos_usuario[i + 1]), Int32.Parse(datos_usuario[i + 2])] = "X";
+                    i = i + 2;
+                }
+            }
+
+            //INTRODUCIR ATRACCIONES
+            for (int i = 0; i < datos_parque.Length; i++)
+            {
+                if (datos_parque[i] == "A")
+                {
+                    mapa[Int32.Parse(datos_parque[i + 1]), Int32.Parse(datos_parque[i + 2])] = "A";
+                    i = i + 2;
+                }
+            }
+
+            //MOSTRAR MAPA
+            for (int i = 0; i < 20; i++)
+            {
+                for (int j = 0; i < 20; j++)
+                {
+                    Console.WriteLine(mapa[i, j]);
+                }
+            }
+        }
     }
 
+    public static void SalirParque(int respuesta,string bootstrapServ, string nombreTopic)
+    {
+        String s;
+
+        s = "4 ";
+        Console.WriteLine("Alias de usuario: ");
+        s += Console.ReadLine() + " ";
+        Console.WriteLine("Password de usuario: ");
+        s += Console.ReadLine();
+
+        var config2 = new ProducerConfig
+        {
+            BootstrapServers = bootstrapServ,
+        };
+
+        using (var producer = new ProducerBuilder<Null, string>(config2).Build())
+        {
+            producer.Produce(nombreTopic, new Message<Null, string> { Value = "" });
+            producer.Flush(TimeSpan.FromSeconds(10));
+        }
+    }
 
     public static int Main(String[] args)
     {
-
+        string bootstrapServ = "";
+        string nombreTopic = "";
         int respuesta = 0;
+        string hola;
+        Console.Write("Por favor, introduce el bootstrap Server: ");
+        bootstrapServ = Console.ReadLine();
+        Console.Write("Introduzca el nombre del topic: ");
+        nombreTopic = Console.ReadLine();
 
         do
         {
@@ -264,14 +355,9 @@ public class AsynchronousClient
                     StartClient(respuesta);
                     break;
                 case 3:
-                    string bootstrapServ = "";
-                    string nombreTopic = "";
                     //En caso de que no se introduzcan valores como argumento, cogemos la configuracion por defecto:
 
-                    Console.Write("Por favor, introduce el bootstrap Server: ");
-                    bootstrapServ = Console.ReadLine();
-                    Console.Write("Introduzca el nombre del topic: ");
-                    nombreTopic = Console.ReadLine();
+                    
                     string[,] map = new string[20, 20];
 
                     var config = new ConsumerConfig
@@ -281,32 +367,21 @@ public class AsynchronousClient
                         GroupId = "console-consumer-43044"
 
                     };
-                   
-                    using (var consumer = new ConsumerBuilder<Null, string>(config)
-                    .Build())
+
+                    var config2 = new ConsumerConfig
                     {
-                        consumer.Subscribe(nombreTopic);
-                        for(int i = 0; i < 20; i++)
-                        {
-                            for(int j = 0; j < 20; j++)
-                            {
-                                ConsumeResult<Null, string> consumeResult = consumer.Consume();
-                                map[i, j] = consumeResult.Value;
-                            }
-                        }
-                    }
-                    for (int i = 0; i < 20; i++)
-                    {
-                        for (int j = 0; j < 20; j++)
-                        {
-                            Console.Write(map[i, j]);
-                        }
-                        Console.WriteLine("");
-                    }
+
+                        BootstrapServers = bootstrapServ,
+
+                    };
+
+                    
+
+                    EntrarParque(respuesta, bootstrapServ, nombreTopic);
 
                     break;
                 case 4:
-
+                    SalirParque(respuesta,bootstrapServ,nombreTopic);
                     break;
                 case 5:
                     break;
